@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+    php:
+        build:
+            context: ./.docker
+            dockerfile: Dockerfile.php-fpm
+        tty: true
+        volumes:
+        - .:/app
+        environment:
+        - DB_DATABASE=laravel
+        - DB_USERNAME=laravel
+        - DB_PASSWORD=laravel
+        - LOG_CHANNEL=errorlog
+        - CACHE_DRIVER=redis
+        - REDIS_CLIENT=predis
+        - REDIS_HOST=redis
+
+    nginx:
+        image: bitnami/nginx:1.16.1
+        ports:
+        - 8080:8080
+        volumes:
+        - .:/app
+        - .docker/nginx-site.conf:/opt/bitnami/nginx/conf/server_blocks/site.conf
+
+    postgresql:
+        image: bitnami/postgresql:11.7.0
+        ports:
+        - 5432:5432
+        environment:
+        - POSTGRESQL_DATABASE=laravel
+        - POSTGRESQL_USERNAME=laravel
+        - POSTGRESQL_PASSWORD=laravel
+
+    redis:
+        image: bitnami/redis:4.0.14
+        ports:
+        - 6379:6379
+        environment:
+        - ALLOW_EMPTY_PASSWORD=yes
+
